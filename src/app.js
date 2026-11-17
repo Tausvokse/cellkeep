@@ -82,7 +82,7 @@ for (const name of ['risks', 'preview']) {
   $(name + '-tab').addEventListener('keydown', event => { if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) { event.preventDefault(); tab(event.key === 'Home' ? 'risks' : event.key === 'End' ? 'preview' : name === 'risks' ? 'preview' : 'risks', true); } });
 }
 async function loadFile(selected) {
-  file = selected; source = selected.name;
+  file = selected; source = selected.name; raw = '';
   const current = ++generation;
   invalidate(); message('Reading local file…');
   try {

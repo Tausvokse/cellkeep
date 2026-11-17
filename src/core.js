@@ -76,7 +76,7 @@ export async function createWorkbook(data, header = true) {
     // OOXML reserves _xHHHH_ escapes and XML normalizes raw CR characters.
     // Escape source underscores first, then encode CR, so Excel reads the original text.
     const added = sheet.addRow(row.map(value => String(value)
-      .replace(/_x([0-9a-f]{4})_/gi, '_x005F_x$1_')
+      .replace(/_x[0-9a-f]{4}_/gi, match => '_x005F_' + match.slice(1))
       .replace(/\r/g, '_x000D_')));
     added.eachCell(cell => { cell.numFmt = '@'; });
   });

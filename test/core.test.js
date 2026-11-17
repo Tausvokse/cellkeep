@@ -98,7 +98,7 @@ test('OOXML stores risky values as shared strings, with no formula or hyperlink 
 });
 
 test('XLSX preserves XML-like strings, literal escape-looking text, CR and supplementary Unicode', async () => {
-  const values = ['_x0041_', '&<>', 'a\rb', '😀', 'line\nnext', '\ttext\t'];
+  const values = ['_x0041_', '_X0041_', '_x005f_', '_x005F_x0041_', '_x000D_', '_x0000_', '&<>', 'a\rb', '😀', 'line\nnext', '\ttext\t'];
   const data = { rows: [values], width: values.length };
   const book = new ExcelJS.Workbook(); await book.xlsx.load(await createWorkbook(data, false));
   assert.deepEqual(book.getWorksheet('Data').getRow(1).values.slice(1), values);
