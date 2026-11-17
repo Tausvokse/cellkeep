@@ -1,0 +1,11 @@
+import { build } from 'esbuild';
+import { mkdir, copyFile, cp } from 'node:fs/promises';
+await mkdir('dist', { recursive: true });
+await build({ entryPoints: ['src/app.js'], bundle: true, outfile: 'dist/app.js', platform: 'browser', format: 'iife', target: ['es2020'], minify: true, legalComments: 'eof' });
+await copyFile('src/index.html', 'dist/index.html');
+await copyFile('src/styles.css', 'dist/styles.css');
+await cp('public', 'dist', { recursive: true });
+await copyFile('LICENSE', 'dist/LICENSE.txt');
+await copyFile('NOTICE.md', 'dist/NOTICE.md');
+await import('./notices.mjs');
+console.log('Built dist/ — open index.html offline or run npm start');

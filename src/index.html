@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Inspect CSV for leading zeros, long IDs and formula-like values. Export a literal-text Excel workbook locally, without uploading your data.">
+  <meta name="theme-color" content="#225e4a">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' file:; script-src 'self' file:; style-src 'self' file:; img-src 'self' file: data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Cellkeep — Your CSV, kept intact</title>
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <script defer src="./app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#workspace">Skip to workspace</a>
+  <header class="masthead"><a class="brand" href="./index.html" aria-label="Cellkeep home"><span class="brandmark" aria-hidden="true">01</span>Cellkeep</a><div class="mastnote"><span class="status-dot"></span>On your device. Off the cloud.</div><a class="quiet-link" href="#how-it-works">How it works <span aria-hidden="true">↗</span></a></header>
+  <main>
+    <section class="intro" aria-labelledby="headline"><div><p class="eyebrow">CSV → Excel, without the surprises</p><h1 id="headline">Your IDs are text.<br>Keep them that way.</h1><p class="intro-copy">Keep the zeros in your SKUs, every digit in a tracking ID, and dates exactly as written. Inspect a CSV, then save an Excel file with every cell stored as text.</p></div><div class="specimen" aria-label="Example: leading zeros preserved"><div class="specimen-label"><span>Original value</span><span>Stored as text</span></div><div class="specimen-value"><span class="kept-zeros">00</span>49182<span class="text-marker">Aa</span></div><div class="specimen-bottom"><span class="cell-ref">A2</span><span>Seven characters in. Seven characters out.</span></div></div></section>
+    <section id="workspace" class="workspace" aria-label="CSV workspace">
+      <div class="workspace-title"><h2>Inspect your CSV</h2><span>01 / Import &nbsp; → &nbsp; 02 / Review &nbsp; → &nbsp; 03 / Keep</span></div>
+      <div class="workgrid">
+        <aside class="import-panel">
+          <h3>Start with the original</h3><p class="secondary">Use the export from your source system, before opening it in Excel.</p>
+          <div class="dropzone" id="dropzone"><span class="file-glyph" aria-hidden="true">CSV</span><p>Drop a CSV or TSV here</p><span class="secondary">Up to 5 MB · stays on this device</span><label class="button primary file-button" for="file">Choose a file</label><input type="file" id="file" accept=".csv,.tsv,.txt,text/csv,text/tab-separated-values"></div>
+          <button class="button secondary-button full" id="demo">Try a sample export <span aria-hidden="true">→</span></button>
+          <div class="divider"><span>or paste your data</span></div>
+          <label class="sr-only" for="paste">CSV text</label><textarea id="paste" spellcheck="false" placeholder="sku,tracking_id,date_code&#10;0049182,92748901234567890123,03-04"></textarea><button class="button secondary-button full" id="inspect-paste">Inspect pasted CSV</button>
+          <div class="import-options"><label for="delimiter">Delimiter<select id="delimiter"><option value="">Detect automatically</option><option value=",">Comma</option><option value=";">Semicolon</option><option value="tab">Tab</option><option value="|">Pipe</option></select></label><label for="encoding">File encoding<select id="encoding"><option value="utf-8">UTF-8</option><option value="utf-16le">UTF-16 LE</option><option value="utf-16be">UTF-16 BE</option><option value="windows-1252">Windows-1252</option><option value="windows-1251">Windows-1251</option></select></label><label class="checkbox-label"><input type="checkbox" id="header" checked>First row is a header</label></div>
+          <p class="small-note">No upload. No account. No analytics.<br>Processing happens in your browser.</p>
+        </aside>
+        <div class="review-panel">
+          <div id="message" role="status" aria-live="polite" class="message" hidden></div>
+          <div id="empty" class="empty"><div class="empty-sheet" aria-hidden="true"><span class="sheet-top">A<span>B</span><span>C</span></span><span>00128<span>03-04</span><span>Text</span></span><span>00129<span>06-07</span><span>Text</span></span><span>00130<span>08-09</span><span>Text</span></span></div><h3>Catch the changes before they happen</h3><p>We flag values a spreadsheet might reinterpret.<br>You get an Excel file that keeps the original text.</p><div class="empty-legend"><span>Leading zeros</span><span>Long IDs</span><span>Date-like text</span></div></div>
+          <div id="results" hidden>
+            <div class="file-heading"><div><p class="eyebrow" id="source-label">Source file</p><h3 id="filename"></h3></div><button class="text-button" id="clear">Clear data</button></div>
+            <div class="stats"><div><span>Data rows</span><strong id="row-count">0</strong></div><div><span>Columns</span><strong id="column-count">0</strong></div><div><span>Cells to review</span><strong class="risk-number" id="risk-count">0</strong></div></div>
+            <div class="review-tabs" role="tablist" aria-label="Review views"><button id="risks-tab" role="tab" aria-selected="true" aria-controls="risks-panel" tabindex="0">Risk review <span id="risk-tab-count"></span></button><button id="preview-tab" role="tab" aria-selected="false" aria-controls="preview-panel" tabindex="-1">Data preview</button></div>
+            <div id="risks-panel" role="tabpanel" aria-labelledby="risks-tab"><div class="filter-row"><label for="filter">Show<select id="filter"><option value="all">All flagged cells</option><option value="zeros">Leading zeros</option><option value="precision">Long numbers</option><option value="date">Date-like text</option><option value="scientific">Scientific notation</option><option value="formula">Formula-like text</option><option value="whitespace">Edge whitespace</option></select></label><span id="finding-summary"></span></div><div id="findings"></div><div class="pagination"><button class="text-button" id="previous">← Previous</button><span id="page-label"></span><button class="text-button" id="next">Next →</button></div></div>
+            <div id="preview-panel" role="tabpanel" aria-labelledby="preview-tab" hidden><p class="preview-note" id="preview-note"></p><div class="table-scroll" tabindex="0" aria-label="Source CSV preview"><table id="preview-table"></table></div></div>
+            <div class="export-panel"><div><h3>Keep every cell as text</h3><p>All values are preserved, including unflagged cells.<br>Numbers will be text, so calculations need conversion.</p></div><button id="export" class="button primary">Download .xlsx <span aria-hidden="true">↓</span></button></div>
+            <div class="report-row"><button id="report" class="text-button">Download risk report (.json)</button><span id="delimiter-note"></span></div>
+            <p class="small-note">Warnings are heuristics; spreadsheet behavior varies. This cannot recover digits already lost in a source file. The JSON report includes your source values.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="explanation" id="how-it-works"><div><p class="eyebrow">A small tool for a costly little problem</p><h2>CSV has values.<br>It has no cell types.</h2><p>When you open CSV directly, your spreadsheet guesses. A product code can become a number. A reference can become a date. Cellkeep creates a real .xlsx workbook with explicit text cells, so the guesses never have to happen.</p></div><dl><div><dt>01 <span>Read the original</span></dt><dd>Comma, semicolon, tab or pipe. Quoted fields and multiline text stay together. Choose a different encoding for older exports.</dd></div><div><dt>02 <span>Review the sensitive values</span></dt><dd>See the source cell, exact value and reason it needs care. No values are rewritten or prefixed with apostrophes.</dd></div><div><dt>03 <span>Take a workbook with you</span></dt><dd>Every cell is saved as text. A header row gets a filter and a frozen pane. Works offline from the downloaded app folder.</dd></div></dl></section>
+  </main>
+  <footer><a class="brand" href="./index.html">Cellkeep<span class="version">v1.0.0</span></a><span>Your original values deserve to stay original</span><a href="https://github.com/Tausvokse/cellkeep" target="_blank" rel="noopener noreferrer">Source & documentation ↗</a></footer>
+</body>
+</html>
